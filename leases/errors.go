@@ -24,5 +24,7 @@ type ErrEncodeLease struct {
 
 // Error is the error interface implementation
 func (e ErrEncodeLease) Error() string {
-	return fmt.Sprintf("error encoding lease for cluster %s (%s)", e.l.ClusterName, e.encodeErr)
+	return fmt.Sprintf(
+		"error encoding lease for cluster %s (%s)",
+		e.l.ClusterDetails.ID, e.encodeErr)
 }

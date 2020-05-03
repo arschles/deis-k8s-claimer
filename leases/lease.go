@@ -3,6 +3,8 @@ package leases
 import (
 	"encoding/json"
 	"time"
+
+	"github.com/tentsk8s/k8s-claimer/cluster"
 )
 
 const (
@@ -18,16 +20,20 @@ var (
 // Lease is the json-encodable struct that represents
 // a lease for a cluster
 type Lease struct {
-	ClusterType    ClusterType `json:"cluster_type"`
-	ClusterID      ClusterID   `json:"cluster_id"`
-	ClusterName    string      `json:"cluster_name"`
-	ExpirationTime *time.Time  `json:"lease_expiration_time"`
+	ID             ID
+	ClusterDetails *cluster.Details `json:"cluster_details"`
+	ExpirationTime *time.Time       `json:"lease_expiration_time"`
 }
 
 // NewLease creates a new lease with the given cluster name and expiration time
-func NewLease(clusterName string, exprTime *time.Time) *Lease {
+func NewLease(
+	ID ID,
+	clusterDetails *cluster.Details,
+	exprTime *time.Time,
+) *Lease {
 	return &Lease{
-		ClusterName:    clusterName,
+		ID:             ID,
+		ClusterDetails: clusterDetails,
 		ExpirationTime: exprTime,
 	}
 }
@@ -42,7 +48,17 @@ func ParseLease(leaseStr string) (*Lease, error) {
 	return l, nil
 }
 
-// ExpirationTime returns the expiration time of this lease.
+// IsExpired returns true if the lease is expired
 func (l *Lease) IsExpired() bool {
 	return l.ExpirationTime.After(time.Now())
+}
+
+func (l *Lease) Free() error {
+	l.ExpirationTime = &zeroTime
+	return nil
+}
+
+func (l *Lease) Renew(newDur time.Duration) {
+	newExpr := time.Now().Add(newDur)
+	l.ExpirationTime = &newExpr
 }

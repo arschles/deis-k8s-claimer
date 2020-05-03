@@ -7,7 +7,8 @@ import (
 
 	"github.com/tentsk8s/k8s-claimer/handlers"
 	"github.com/tentsk8s/k8s-claimer/htp"
-	"github.com/tentsk8s/k8s-claimer/providers/azure"
+
+	// "github.com/tentsk8s/k8s-claimer/providers/azure"
 	"github.com/tentsk8s/k8s-claimer/providers/gke"
 )
 
@@ -84,16 +85,6 @@ func main() {
 	gkeClusterLister := gke.NewGKEClusterLister(containerService)
 	azureClusterLister := azure.NewAzureClusterLister(azureConfig)
 
-	// config, err := rest.InClusterConfig()
-	// if err != nil {
-	// 	log.Fatalf("Error creating Kubernetes client (%s)", err)
-	// }
-	// k8sClient, err := kubernetes.NewForConfig(config)
-	// if err != nil {
-	// 	log.Fatalf("Error creating Kubernetes client (%s)", err)
-	// }
-
-	// services := k8sClient.Services(serverConf.Namespace)
 	mux := http.NewServeMux()
 	createLeaseHandler := handlers.CreateLease(
 		// services,

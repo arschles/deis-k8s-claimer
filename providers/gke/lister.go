@@ -18,21 +18,21 @@ type Lister interface {
 // GKEClusterLister is a ClusterLister implementation that uses the GKE Go SDK to list clusters
 // on a live GKE cluster
 type gkeLister struct {
-	svc *container.Service
+	svc    *container.Service
 	projID string
-	zone string
+	zone   string
 }
 
 // NewLister creates a new lister
 func NewLister(
 	svc *container.Service,
 	projID,
-	zone string
+	zone string,
 ) providers.Lister {
 	return &gkeLister{
-		svc: svc,
+		svc:    svc,
 		projID: projID,
-		zone: zone,
+		zone:   zone,
 	}
 }
 

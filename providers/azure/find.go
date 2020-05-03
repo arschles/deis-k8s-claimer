@@ -31,12 +31,14 @@ func (e errExpiredLeaseAzureMissing) Error() string {
 }
 
 // searchForFreeCluster looks for an available Azure cluster to lease.
-// It will try and match clusterRegex if possible or clusterVersion
 //
 // Returns errNoAvailableOrExpiredClustersFound if it found no free or expired lease
 // Returns errExpiredLeaseAzureMissing if it found an expired lease but the cluster associated with
 // that lease doesn't exist in Azure
-func searchForFreeCluster(clusterMap *Map, leaseMap *leases.Map, clusterRegex string, clusterVersion string) (*containerservice.ContainerService, error) {
+func searchForFreeCluster(
+
+	lister *azureLister,
+) (*containerservice.ContainerService, error) {
 	uuidAndLeases, expiredLeaseErr := findExpiredLeases(leaseMap)
 	if expiredLeaseErr == nil {
 		for _, expiredLease := range uuidAndLeases {

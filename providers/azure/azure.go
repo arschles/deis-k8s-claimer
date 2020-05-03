@@ -14,7 +14,6 @@ import (
 	// "k8s.io/client-go/pkg/api/v1"
 
 	"github.com/pborman/uuid"
-	"github.com/tentsk8s/k8s-claimer/api"
 	"github.com/tentsk8s/k8s-claimer/config"
 	"github.com/tentsk8s/k8s-claimer/htp"
 	"github.com/tentsk8s/k8s-claimer/k8s"
@@ -26,9 +25,7 @@ import (
 // It will write back on the response the necessary connection
 // information in json format
 func Lease(
-	w http.ResponseWriter,
-	req *api.CreateLeaseReq,
-	clusterLister ClusterLister,
+	clusterLister *azureLister,
 	azureConfig *config.Azure,
 	k8sServiceName string,
 ) {
@@ -40,7 +37,7 @@ func Lease(
 		return
 	}
 
-	availableCluster, err := searchForFreeCluster(clusterMap, leaseMap, req.ClusterRegex, req.ClusterVersion)
+	availableCluster, err := searchForFreeCluster(clusterMap)
 	if err != nil {
 		switch e := err.(type) {
 		case errNoAvailableOrExpiredClustersFound:
@@ -95,7 +92,7 @@ func Lease(
 	}
 }
 
-func getSvcsAndClusters(clusterLister ClusterLister) (*Map, *v1.Service, error) {
+func getSvcsAndClusters(clusterLister *azureLister) (*Map, *v1.Service, error) {
 
 	errCh := make(chan error)
 	clusterMapCh := make(chan *Map)

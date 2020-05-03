@@ -28,6 +28,7 @@ require (
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/protobuf v1.3.5
 	github.com/google/gofuzz v1.1.0
+	github.com/google/uuid v1.1.1
 	github.com/jonboulle/clockwork v0.0.0-20141017032234-72f9bd7c4e0c
 	github.com/juju/ratelimit v0.0.0-20151125201925-77ed1c8a0121
 	github.com/kelseyhightower/envconfig v1.3.1-0.20170424163737-b6fde1625d63

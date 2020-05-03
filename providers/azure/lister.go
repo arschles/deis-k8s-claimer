@@ -5,20 +5,21 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/arm/containerservice"
 	"github.com/Azure/go-autorest/autorest/azure"
+	"github.com/tentsk8s/k8s-claimer/config"
 )
 
 type azureLister struct {
-	listRes *containerservice.ListResult
+	config *config.Azure
 }
 
-func NewLister(listRes *containerservice.ListResult) providers.Lister {
+func NewLister(cfg *config.Azure) providers.Lister {
 	return &azureLister{
-		listRes: listRes,
+		config: cfg,
 	}
 }
 
 // List is the ClusterLister interface implementation
-func (a *azureLister) List() (*containerservice.ListResult, error) {
+func (a *azureLister) List() []providers.Details { //(*containerservice.ListResult, error) {
 	bearerAuthorizer, err := NewBearerAuthorizer(
 		a.Config,
 		azure.PublicCloud.ResourceManagerEndpoint,
