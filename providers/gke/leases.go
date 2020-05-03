@@ -23,25 +23,25 @@ func (l *leaseOps) Acquire(
 	cType cluster.Type,
 	dur time.Duration,
 ) (*cluster.Details, error) {
-	lac := l.storage.findAndLease(dur)
-	if lac != nil {
-		return lacToStdDetails(lac), nil
+	lease := l.storage.findAndLease(dur)
+	if lease != nil {
+		return leaseToStdDetails(lease), nil
 	}
 	// TODO: create a new cluster and call l.storage.addNewCluster
 	return nil, nil
 }
 
 func (l *leaseOps) Free(id leases.ID) (*cluster.Details, error) {
-	lac, err := l.storage.free(id)
+	lease, err := l.storage.free(id)
 	if err != nil {
 		return nil, fmt.Errorf("Error releasing lease (%s)", err)
 	}
-	return lacToStdDetails(lac), err
+	return leaseToStdDetails(lease), err
 }
 
-func lacToStdDetails(lac *leaseAndCluster) *cluster.Details {
+func leaseToStdDetails(lease *leases.Lease) *cluster.Details {
 	return &cluster.Details{
-		ID:   lac.Lease.ID,
+		ID:   lease.ClusterDetails.ID,
 		Type: cluster.GKECluster,
 	}
 }

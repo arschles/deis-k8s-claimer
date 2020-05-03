@@ -24,11 +24,11 @@ type gkeLister struct {
 }
 
 // NewLister creates a new lister
-func NewLister(
+func newLister(
 	svc *container.Service,
 	projID,
 	zone string,
-) providers.Lister {
+) *gkeLister {
 	return &gkeLister{
 		svc:    svc,
 		projID: projID,

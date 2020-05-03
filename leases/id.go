@@ -1,15 +1,15 @@
 package leases
 
 import (
-	"fmt"
-
 	"github.com/pborman/uuid"
 )
 
-type ID uuid.UUID
+type ID struct {
+	uuid.UUID
+}
 
 func (c *ID) String() string {
-	return fmt.Sprintf("%s.%s", c.name, c.uid)
+	return c.UUID.String()
 }
 
 func (c *ID) MarshalJSON() ([]byte, error) {
