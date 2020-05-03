@@ -1,14 +1,10 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/pborman/uuid"
-	"github.com/tentsk8s/k8s-claimer/config"
 	"github.com/tentsk8s/k8s-claimer/htp"
-	"github.com/tentsk8s/k8s-claimer/providers/azure"
-	"github.com/tentsk8s/k8s-claimer/providers/gke"
 )
 
 // DeleteLease is the handler for
@@ -23,7 +19,7 @@ func (d DeleteLease) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		htp.Error(
 			w,
 			http.StatusBadRequest,
-			"You must specify the lease ID"
+			"You must specify the lease ID",
 		)
 		return
 	}
@@ -43,7 +39,7 @@ func (d DeleteLease) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			w,
 			http.StatusBadRequest,
 			"Bad request (%s)",
-			err
+			err,
 		)
 	}
 	w.WriteHeader(200)
@@ -53,4 +49,3 @@ func (d DeleteLease) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 type deleteLeaseReq struct {
 	ID leases.ClusterID `json:"id"`
 }
-

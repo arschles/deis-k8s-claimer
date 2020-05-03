@@ -8,8 +8,8 @@ import (
 )
 
 type Leaser interface {
-	Acquire(cluster.Type, time.Duration) (*cluster.Details, error)
-	Free(leases.ID) (*cluster.Details, error)
+	Acquire(cluster.Type, time.Duration) (*leases.Lease, error)
+	Free(leases.ID) (*leases.Lease, error)
 }
 
 /*

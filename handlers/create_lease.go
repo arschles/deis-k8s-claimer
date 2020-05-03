@@ -1,19 +1,22 @@
 package handlers
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
+	"github.com/tentsk8s/k8s-claimer/cluster"
 	"github.com/tentsk8s/k8s-claimer/htp"
-	"github.com/tentsk8s/k8s-claimer/providers/azure"
-	"github.com/tentsk8s/k8s-claimer/providers/gke"
+	"github.com/tentsk8s/k8s-claimer/k8s"
+	"github.com/tentsk8s/k8s-claimer/leases"
+	"github.com/tentsk8s/k8s-claimer/providers"
 )
 
 // CreateLease creates the handler that responds to the POST
 // /lease endpoint
 type CreateLease struct {
-	lister providers.Lister
 	leaser providers.Leaser
 }
 
@@ -26,13 +29,16 @@ func (c CreateLease) ServeHTTP(
 		log.Printf("Error decoding JSON -- %s", err)
 		htp.Error(
 			w, http.StatusBadRequest,
-			"Error decoding JSON (%s"),
+			"Error decoding JSON (%s)",
 			err,
 		)
 		return
 	}
 
-	details, err := c.leaser.Lease(req.ClusterType)
+	lease, err := c.leaser.Acquire(
+		req.ClusterType,
+		time.Duration(req.MaxTimeSec)*time.Second,
+	)
 	if err != nil {
 		htp.Error(
 			w,
@@ -42,14 +48,14 @@ func (c CreateLease) ServeHTTP(
 		)
 		return
 	}
-	resp := &createLeaseResp {
+	resp := &createLeaseResp{
 		KubeConfigStr: "TODO",
-		IP             : "TODO",
-		ID details.ClusterID,
-		ClusterType details.ClusterType,
-		TimeLeft time.Duration(req.MaxTimeSec) * time.Seconds,
+		IP:            "TODO",
+		ID:            lease.ID,
+		ClusterType:   lease.ClusterDetails.Type,
+		TimeLeftSec:   req.MaxTimeSec,
 	}
-	
+
 	resBytes, err := json.Marshal(resp)
 	if err != nil {
 		htp.Error(
@@ -63,21 +69,21 @@ func (c CreateLease) ServeHTTP(
 	w.Write(resBytes)
 }
 
-
 // createLeaseReq is the encoding/json compatible struct that
 // represents the POST /lease request body
 type createLeaseReq struct {
-	MaxTimeSec  int                `json:"max_time"`
-	ClusterType leases.ClusterType `json:"cloud_provider"`
+	MaxTimeSec  int          `json:"max_time"`
+	ClusterType cluster.Type `json:"cloud_provider"`
 }
 
 // createLeaseResp is the encoding/json compatible struct that
 // represents the POST /lease response body
 type createLeaseResp struct {
-	KubeConfigStr  string `json:"kubeconfig"`
-	IP             string `json:"ip"`
-	ID cluster.ID `json:"id"`
-	ClusterType cluster.Type `json:"cluster_type"`
+	KubeConfigStr string       `json:"kubeconfig"`
+	IP            string       `json:"ip"`
+	ID            leases.ID    `json:"id"`
+	ClusterType   cluster.Type `json:"cluster_type"`
+	TimeLeftSec   int          `json:"time_left"`
 }
 
 // KubeConfigBytes decodes c.KubeConfig by the RFC 4648 standard.
