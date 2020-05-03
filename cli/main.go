@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/codegangsta/cli"
-	"github.com/deis/k8s-claimer/cli/commands"
+	"github.com/tentsk8s/k8s-claimer/cli/commands"
 )
 
 // This value is overwritten by the linker during build.

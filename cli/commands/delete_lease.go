@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/codegangsta/cli"
-	"github.com/deis/k8s-claimer/client"
+	"github.com/tentsk8s/k8s-claimer/client"
 )
 
 // DeleteLease is a cli.Command action for deleting a lease

@@ -5,13 +5,10 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/deis/k8s-claimer/handlers"
-	"github.com/deis/k8s-claimer/htp"
-	"github.com/deis/k8s-claimer/k8s"
-	"github.com/deis/k8s-claimer/providers/azure"
-	"github.com/deis/k8s-claimer/providers/gke"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
+	"github.com/tentsk8s/k8s-claimer/handlers"
+	"github.com/tentsk8s/k8s-claimer/htp"
+	"github.com/tentsk8s/k8s-claimer/providers/azure"
+	"github.com/tentsk8s/k8s-claimer/providers/gke"
 )
 
 const (
@@ -23,22 +20,31 @@ var (
 	errNilConfig = errors.New("nil config")
 )
 
-func kubeNamespacesFromConfig() func(*k8s.KubeConfig) (k8s.NamespaceListerDeleter, error) {
-	return func(conf *k8s.KubeConfig) (k8s.NamespaceListerDeleter, error) {
-		if conf == nil {
-			return nil, errNilConfig
-		}
-		cl, err := k8s.CreateKubeClientFromConfig(conf)
-		if err != nil {
-			return nil, err
-		}
-		return cl.Namespaces(), nil
-	}
-}
+// func kubeNamespacesFromConfig() func(*k8s.KubeConfig) (k8s.NamespaceListerDeleter, error) {
+// 	return func(conf *k8s.KubeConfig) (k8s.NamespaceListerDeleter, error) {
+// 		if conf == nil {
+// 			return nil, errNilConfig
+// 		}
+// 		cl, err := k8s.CreateKubeClientFromConfig(conf)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		return cl.Namespaces(), nil
+// 	}
+// }
 
-func configureRoutesWithAuth(serveMux *http.ServeMux, createLeaseHandler http.Handler, deleteLeaseHandler http.Handler, authToken string) {
-	createLeaseHandler = htp.MethodMux(map[htp.Method]http.Handler{htp.Post: createLeaseHandler})
-	deleteLeaseHandler = htp.MethodMux(map[htp.Method]http.Handler{htp.Delete: deleteLeaseHandler})
+func configureRoutesWithAuth(
+	serveMux *http.ServeMux,
+	createLeaseHandler http.Handler,
+	deleteLeaseHandler http.Handler,
+	authToken string,
+) {
+	createLeaseHandler = htp.MethodMux(
+		map[htp.Method]http.Handler{htp.Post: createLeaseHandler},
+	)
+	deleteLeaseHandler = htp.MethodMux(
+		map[htp.Method]http.Handler{htp.Delete: deleteLeaseHandler},
+	)
 
 	serveMux.Handle("/lease", handlers.WithAuth(authToken, authTokenKey, createLeaseHandler))
 	serveMux.Handle("/lease/", handlers.WithAuth(authToken, authTokenKey, deleteLeaseHandler))
@@ -52,6 +58,7 @@ func CreateHealthzHandler() http.Handler {
 }
 
 func main() {
+	leaseStorage := leases.NewStorage()
 	serverConf, err := parseServerConfig(appName)
 	if err != nil {
 		log.Fatalf("Error getting server config (%s)", err)
@@ -67,26 +74,29 @@ func main() {
 		log.Fatalf("Error getting azure config (%s) -- %+v", err, azureConfig)
 	}
 
-	containerService, err := gke.GetContainerService(googleConfig.AccountFile.ClientEmail, gke.PrivateKey(googleConfig.AccountFile.PrivateKey))
+	containerService, err := gke.GetContainerService(
+		googleConfig.AccountFile.ClientEmail,
+		gke.PrivateKey(googleConfig.AccountFile.PrivateKey),
+	)
 	if err != nil {
 		log.Fatalf("Error creating GKE client (%s)", err)
 	}
 	gkeClusterLister := gke.NewGKEClusterLister(containerService)
 	azureClusterLister := azure.NewAzureClusterLister(azureConfig)
 
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		log.Fatalf("Error creating Kubernetes client (%s)", err)
-	}
-	k8sClient, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		log.Fatalf("Error creating Kubernetes client (%s)", err)
-	}
+	// config, err := rest.InClusterConfig()
+	// if err != nil {
+	// 	log.Fatalf("Error creating Kubernetes client (%s)", err)
+	// }
+	// k8sClient, err := kubernetes.NewForConfig(config)
+	// if err != nil {
+	// 	log.Fatalf("Error creating Kubernetes client (%s)", err)
+	// }
 
-	services := k8sClient.Services(serverConf.Namespace)
+	// services := k8sClient.Services(serverConf.Namespace)
 	mux := http.NewServeMux()
 	createLeaseHandler := handlers.CreateLease(
-		services,
+		// services,
 		serverConf.ServiceName,
 		gkeClusterLister,
 		azureClusterLister,
@@ -94,14 +104,14 @@ func main() {
 		googleConfig,
 	)
 	deleteLeaseHandler := handlers.DeleteLease(
-		services,
+		// services,
 		serverConf.ServiceName,
 		gkeClusterLister,
 		azureClusterLister,
 		azureConfig,
 		googleConfig,
 		serverConf.ClearNamespaces,
-		kubeNamespacesFromConfig(),
+		// kubeNamespacesFromConfig(),
 	)
 
 	mux.Handle("/healthz", CreateHealthzHandler())

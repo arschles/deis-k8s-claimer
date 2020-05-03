@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/arschles/assert"
-	"github.com/deis/k8s-claimer/testutil"
 	"github.com/pborman/uuid"
+	"github.com/tentsk8s/k8s-claimer/testutil"
 )
 
 func TestParseMapFromAnnotations(t *testing.T) {

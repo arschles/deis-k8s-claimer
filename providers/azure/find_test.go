@@ -7,10 +7,10 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/arm/containerservice"
 	"github.com/arschles/assert"
-	"github.com/deis/k8s-claimer/config"
-	"github.com/deis/k8s-claimer/leases"
-	"github.com/deis/k8s-claimer/testutil"
 	"github.com/pborman/uuid"
+	"github.com/tentsk8s/k8s-claimer/config"
+	"github.com/tentsk8s/k8s-claimer/leases"
+	"github.com/tentsk8s/k8s-claimer/testutil"
 )
 
 var (

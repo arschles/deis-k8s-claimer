@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/deis/k8s-claimer/htp"
+	"github.com/tentsk8s/k8s-claimer/htp"
 )
 
 type endpoint struct {

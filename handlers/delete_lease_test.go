@@ -6,23 +6,19 @@ import (
 	"testing"
 	"time"
 
-	"k8s.io/client-go/pkg/api/v1"
-
 	"github.com/arschles/assert"
-	"github.com/deis/k8s-claimer/config"
-	"github.com/deis/k8s-claimer/k8s"
-	"github.com/deis/k8s-claimer/leases"
-	"github.com/deis/k8s-claimer/providers/gke"
-	"github.com/deis/k8s-claimer/testutil"
 	"github.com/pborman/uuid"
+	"github.com/tentsk8s/k8s-claimer/config"
+	"github.com/tentsk8s/k8s-claimer/leases"
+	"github.com/tentsk8s/k8s-claimer/providers/gke"
+	"github.com/tentsk8s/k8s-claimer/testutil"
+	v1 "k8s.io/client-go/pkg/api/v1"
 )
 
 func TestDeleteLeaseNoToken(t *testing.T) {
-	getterUpdater := k8s.NewFakeServiceGetterUpdater(nil, nil, nil, nil)
 	clusterLister := gke.NewFakeClusterLister(newListClusterResp(testutil.GetGKEClusters()), nil)
-	nsListerDeleter := k8s.NewFakeNamespaceListerDeleter(&v1.NamespaceList{}, nil, nil)
 	googleConfig := &config.Google{AccountFileJSON: "test", ProjectID: "proj1", Zone: "zone1"}
-	hdl := DeleteLease(getterUpdater, "claimer", clusterLister, nil, nil, googleConfig, true, k8s.GetNSFunc(nsListerDeleter, nil))
+	hdl := DeleteLease("claimer", nil, nil, googleConfig, true)
 	req, err := http.NewRequest("DELETE", "/lease", nil)
 	req.Header.Set("Authorization", "some awesome token")
 	assert.NoErr(t, err)

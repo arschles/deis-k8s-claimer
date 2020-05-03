@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 
-	"github.com/deis/k8s-claimer/config"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/tentsk8s/k8s-claimer/config"
 )
 
 func parseAzureConfig(appName string) (*config.Azure, error) {

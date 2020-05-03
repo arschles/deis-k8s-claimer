@@ -6,19 +6,21 @@ import (
 	"io"
 	"time"
 
-	"github.com/deis/k8s-claimer/k8s"
+	"github.com/tentsk8s/k8s-claimer/k8s"
+	"github.com/tentsk8s/k8s-claimer/leases"
 )
 
-// CreateLeaseReq is the encoding/json compatible struct that represents the POST /lease
-// request body
+// CreateLeaseReq is the encoding/json compatible struct that
+// represents the POST /lease request body
 type CreateLeaseReq struct {
-	MaxTimeSec     int    `json:"max_time"`
-	ClusterRegex   string `json:"cluster_regex"`
-	ClusterVersion string `json:"cluster_version"`
-	CloudProvider  string `json:"cloud_provider"`
+	MaxTimeSec     int                `json:"max_time"`
+	ClusterRegex   string             `json:"cluster_regex"`
+	ClusterVersion string             `json:"cluster_version"`
+	ClusterType    leases.ClusterType `json:"cloud_provider"`
 }
 
-// MaxTimeDur returns the maximum time specified in c as a time.Duration
+// MaxTimeDur returns the maximum time specified in c as a
+// time.Duration
 func (c CreateLeaseReq) MaxTimeDur() time.Duration {
 	return time.Duration(c.MaxTimeSec) * time.Second
 }
@@ -28,8 +30,8 @@ func (c CreateLeaseReq) ExpirationTime(start time.Time) time.Time {
 	return start.Add(c.MaxTimeDur())
 }
 
-// CreateLeaseResp is the encoding/json compatible struct that represents the POST /lease
-// response body
+// CreateLeaseResp is the encoding/json compatible struct that
+// represents the POST /lease response body
 type CreateLeaseResp struct {
 	KubeConfigStr  string `json:"kubeconfig"`
 	IP             string `json:"ip"`
@@ -39,8 +41,9 @@ type CreateLeaseResp struct {
 	CloudProvider  string `json:"cloud_provider"`
 }
 
-// DecodeCreateLeaseResp decodes rdr from its JSON representation into a CreateLeaseResp.
-// If there was any error reading rdr or it had malformed JSON, returns nil and the error
+// DecodeCreateLeaseResp decodes rdr from its JSON representation
+// into a CreateLeaseResp. If there was any error reading rdr or it
+// had malformed JSON, returns nil and the error
 func DecodeCreateLeaseResp(rdr io.Reader) (*CreateLeaseResp, error) {
 	ret := new(CreateLeaseResp)
 	if err := json.NewDecoder(rdr).Decode(ret); err != nil {
@@ -59,7 +62,8 @@ func (c CreateLeaseResp) KubeConfigBytes() ([]byte, error) {
 	return kubeConfigBytes, nil
 }
 
-// KubeConfig returns decoded and unmarshalled Kubernetes client configuration
+// KubeConfig returns decoded and unmarshalled Kubernetes client
+// configuration
 func (c CreateLeaseResp) KubeConfig() (*k8s.KubeConfig, error) {
 	configBytes, err := c.KubeConfigBytes()
 	if err != nil {

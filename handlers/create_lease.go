@@ -5,17 +5,16 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/deis/k8s-claimer/api"
-	"github.com/deis/k8s-claimer/config"
-	"github.com/deis/k8s-claimer/htp"
-	"github.com/deis/k8s-claimer/k8s"
-	"github.com/deis/k8s-claimer/providers/azure"
-	"github.com/deis/k8s-claimer/providers/gke"
+	"github.com/tentsk8s/k8s-claimer/api"
+	"github.com/tentsk8s/k8s-claimer/config"
+	"github.com/tentsk8s/k8s-claimer/htp"
+	"github.com/tentsk8s/k8s-claimer/providers/azure"
+	"github.com/tentsk8s/k8s-claimer/providers/gke"
 )
 
 // CreateLease creates the handler that responds to the POST /lease endpoint
 func CreateLease(
-	services k8s.ServiceGetterUpdater,
+	// services k8s.ServiceGetterUpdater,
 	k8sServiceName string,
 	gkeClusterLister gke.ClusterLister,
 	azureClusterLister azure.ClusterLister,

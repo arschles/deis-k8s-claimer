@@ -4,8 +4,7 @@ import (
 	"testing"
 
 	"github.com/arschles/assert"
-	"github.com/deis/k8s-claimer/k8s"
-	"k8s.io/client-go/pkg/api/v1"
+	v1 "k8s.io/client-go/pkg/api/v1"
 )
 
 func getNSListerDeleter(listedNamespaces []string) *k8s.FakeNamespaceListerDeleter {

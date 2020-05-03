@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/arschles/assert"
-	"github.com/deis/k8s-claimer/leases"
-	"github.com/deis/k8s-claimer/testutil"
 	"github.com/pborman/uuid"
+	"github.com/tentsk8s/k8s-claimer/leases"
+	"github.com/tentsk8s/k8s-claimer/testutil"
 	container "google.golang.org/api/container/v1"
 )
 

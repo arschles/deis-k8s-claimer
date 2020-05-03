@@ -15,18 +15,20 @@ var (
 	zeroTime time.Time
 )
 
-// Lease is the json-encodable struct that represents what's in the value of one lease annotation
-// in k8s
+// Lease is the json-encodable struct that represents
+// a lease for a cluster
 type Lease struct {
-	ClusterName         string `json:"cluster_name"`
-	LeaseExpirationTime string `json:"lease_expiration_time"`
+	ClusterType    ClusterType `json:"cluster_type"`
+	ClusterID      ClusterID   `json:"cluster_id"`
+	ClusterName    string      `json:"cluster_name"`
+	ExpirationTime *time.Time  `json:"lease_expiration_time"`
 }
 
 // NewLease creates a new lease with the given cluster name and expiration time
-func NewLease(clusterName string, exprTime time.Time) *Lease {
+func NewLease(clusterName string, exprTime *time.Time) *Lease {
 	return &Lease{
-		ClusterName:         clusterName,
-		LeaseExpirationTime: exprTime.Format(TimeFormat),
+		ClusterName:    clusterName,
+		ExpirationTime: exprTime,
 	}
 }
 
@@ -40,13 +42,7 @@ func ParseLease(leaseStr string) (*Lease, error) {
 	return l, nil
 }
 
-// ExpirationTime returns the expiration time of this lease, if l.LeaseExpirationTime was a well
-// formed time string, returns the time and nil. Otherwise returns the zero value of time
-// (i.e. t.IsZero() will return true) and a non-nil error
-func (l Lease) ExpirationTime() (time.Time, error) {
-	t, err := time.Parse(TimeFormat, l.LeaseExpirationTime)
-	if err != nil {
-		return zeroTime, err
-	}
-	return t, nil
+// ExpirationTime returns the expiration time of this lease.
+func (l *Lease) IsExpired() bool {
+	return l.ExpirationTime.After(time.Now())
 }

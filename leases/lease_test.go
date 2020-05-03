@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/arschles/assert"
-	"github.com/deis/k8s-claimer/testutil"
+	"github.com/tentsk8s/k8s-claimer/testutil"
 )
 
 var (

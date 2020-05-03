@@ -10,37 +10,33 @@ import (
 	"os/exec"
 	"time"
 
-	"k8s.io/client-go/pkg/api/v1"
+	v1 "k8s.io/api/core/v1"
+	// "k8s.io/client-go/pkg/api/v1"
 
-	"github.com/deis/k8s-claimer/config"
-	"github.com/deis/k8s-claimer/htp"
-	"github.com/deis/k8s-claimer/leases"
 	"github.com/pborman/uuid"
-
-	"github.com/deis/k8s-claimer/api"
-	"github.com/deis/k8s-claimer/k8s"
+	"github.com/tentsk8s/k8s-claimer/api"
+	"github.com/tentsk8s/k8s-claimer/config"
+	"github.com/tentsk8s/k8s-claimer/htp"
+	"github.com/tentsk8s/k8s-claimer/k8s"
+	"github.com/tentsk8s/k8s-claimer/leases"
 )
 
-// Lease will search for an available cluster on Azure which matches the parameters passed in on the request
-// It will write back on the response the necessary connection information in json format
-func Lease(w http.ResponseWriter,
+// Lease will search for an available cluster on Azure which
+// matches the parameters passed in on the request
+// It will write back on the response the necessary connection
+// information in json format
+func Lease(
+	w http.ResponseWriter,
 	req *api.CreateLeaseReq,
 	clusterLister ClusterLister,
-	services k8s.ServiceGetterUpdater,
 	azureConfig *config.Azure,
-	k8sServiceName string) {
+	k8sServiceName string,
+) {
 
-	clusterMap, svc, err := getSvcsAndClusters(clusterLister, services, k8sServiceName)
+	clusterMap, svc, err := getSvcsAndClusters(clusterLister)
 	if err != nil {
 		log.Printf("Error listing Azure clusters or talking to the k8s API -- %s", err)
 		htp.Error(w, http.StatusInternalServerError, "Error listing Azure clusters or talking to the k8s API -- %s", err)
-		return
-	}
-
-	leaseMap, err := leases.ParseMapFromAnnotations(svc.Annotations)
-	if err != nil {
-		log.Printf("Error parsing leases from Kubernetes annotations -- %s", err)
-		htp.Error(w, http.StatusInternalServerError, "error parsing leases from Kubernetes annotations -- %s", err)
 		return
 	}
 
@@ -62,8 +58,8 @@ func Lease(w http.ResponseWriter,
 		}
 	}
 
-	// There is currently no way to fetch the kubeconfig from the Azure API
-	// So we must scp the file off the master node
+	// There is currently no way to fetch the kubeconfig from the
+	// Azure API so we must scp the file off the master node
 	kubeConfig, err := FetchKubeConfig(*availableCluster.MasterProfile.Fqdn)
 	if err != nil {
 		log.Printf("Error creating kubeconfig file for cluster %s -- %s", *availableCluster.Name, err)
@@ -99,13 +95,15 @@ func Lease(w http.ResponseWriter,
 	}
 }
 
-func getSvcsAndClusters(clusterLister ClusterLister, services k8s.ServiceGetterUpdater, k8sServiceName string) (*Map, *v1.Service, error) {
+func getSvcsAndClusters(clusterLister ClusterLister) (*Map, *v1.Service, error) {
 
 	errCh := make(chan error)
 	clusterMapCh := make(chan *Map)
-	apiServiceCh := make(chan *v1.Service)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(
+		context.Background(),
+		10*time.Second,
+	)
 	defer cancel()
 	go func() {
 		svc, err := services.Get(k8sServiceName)

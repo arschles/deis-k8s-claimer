@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/arm/containerservice"
-	"github.com/deis/k8s-claimer/leases"
+	"github.com/tentsk8s/k8s-claimer/leases"
 )
 
 type errNoAvailableOrExpiredClustersFound struct{}
@@ -153,8 +153,12 @@ func (e errNoSuchCluster) Error() string {
 	return fmt.Sprintf("no such cluster %s", e.name)
 }
 
-// GetClusterFromLease takes a lease and will find the appropriate cluster
-func GetClusterFromLease(lease *leases.Lease, clusterLister ClusterLister) (*containerservice.ContainerService, error) {
+// GetClusterFromLease takes a lease and will find the appropriate
+// cluster
+func GetClusterFromLease(
+	lease *leases.Lease,
+	clusterLister ClusterLister,
+) (*containerservice.ContainerService, error) {
 	clusterMap, err := ParseMapFromAzure(clusterLister)
 	if err != nil {
 		return nil, err

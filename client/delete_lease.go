@@ -3,7 +3,7 @@ package client
 import (
 	"net/http"
 
-	"github.com/deis/k8s-claimer/htp"
+	"github.com/tentsk8s/k8s-claimer/htp"
 )
 
 // DeleteLeaseReq is the encoding/json compatible struct that represents the DELETE /lease request body

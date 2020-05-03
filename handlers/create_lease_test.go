@@ -8,15 +8,14 @@ import (
 	"strings"
 	"testing"
 
-	"k8s.io/client-go/pkg/api/v1"
+	v1 "k8s.io/client-go/pkg/api/v1"
 
 	"github.com/arschles/assert"
-	"github.com/deis/k8s-claimer/api"
-	"github.com/deis/k8s-claimer/config"
-	"github.com/deis/k8s-claimer/k8s"
-	"github.com/deis/k8s-claimer/providers/gke"
-	"github.com/deis/k8s-claimer/testutil"
 	"github.com/pborman/uuid"
+	"github.com/tentsk8s/k8s-claimer/api"
+	"github.com/tentsk8s/k8s-claimer/config"
+	"github.com/tentsk8s/k8s-claimer/providers/gke"
+	"github.com/tentsk8s/k8s-claimer/testutil"
 	container "google.golang.org/api/container/v1"
 	"gopkg.in/yaml.v2"
 )

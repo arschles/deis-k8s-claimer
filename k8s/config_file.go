@@ -122,7 +122,7 @@ func CreateKubeConfigFromCluster(c *container.Cluster) (*KubeConfig, error) {
 
 	var clusters []NamedCluster
 	cluster := Cluster{
-		Server: fmt.Sprintf("https://%s", c.Endpoint),
+		Server:                   fmt.Sprintf("https://%s", c.Endpoint),
 		CertificateAuthorityData: c.MasterAuth.ClusterCaCertificate,
 	}
 	namedCluster := NamedCluster{

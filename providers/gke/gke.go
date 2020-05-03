@@ -8,17 +8,19 @@ import (
 	"net/http"
 	"time"
 
-	"k8s.io/client-go/pkg/api/v1"
+	v1 "k8s.io/api/core/v1"
+	// "k8s.io/client-go/pkg/api/v1"
 
-	"github.com/deis/k8s-claimer/api"
-	"github.com/deis/k8s-claimer/htp"
-	"github.com/deis/k8s-claimer/k8s"
-	"github.com/deis/k8s-claimer/leases"
 	"github.com/pborman/uuid"
+	"github.com/tentsk8s/k8s-claimer/api"
+	"github.com/tentsk8s/k8s-claimer/htp"
+	"github.com/tentsk8s/k8s-claimer/leases"
 )
 
-// Lease will search for an available cluster on GKE which matches the parameters passed in on the request
-// It will write back on the response the necessary connection information in json format
+// Lease will search for an available cluster on GKE which
+// matches the parameters passed in on the request
+// It will write back on the response the necessary connection
+// information in json format
 func Lease(w http.ResponseWriter,
 	req *api.CreateLeaseReq,
 	clusterLister ClusterLister,
